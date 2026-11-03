@@ -116,7 +116,7 @@
   function mostrarEntrar(equipos) {
     $('cargando').hidden = true; $('perfil').hidden = true; $('entrar').hidden = false;
     var sel = $('equipo'), v = sel.value;
-    sel.innerHTML = '<option value="">Escoge tu número de bandera</option>' + (equipos || []).map(function (q) {
+    sel.innerHTML = '<option value="">Escoge tu número de bandera</option><option value="0">No tengo equipo (invitado o profesor)</option>' + (equipos || []).map(function (q) {
       return '<option value="' + q.numero + '">Equipo ' + q.numero + (q.nombre ? ': ' + esc(q.nombre) : '') + '</option>';
     }).join('');
     sel.value = v;
@@ -126,7 +126,7 @@
   function pintar() {
     $('cargando').hidden = true; $('entrar').hidden = true; $('perfil').hidden = false;
     $('hNombre').textContent = 'Hola, ' + st.nombre.split(' ')[0];
-    $('hEquipo').textContent = 'Tu equipo: ' + nombreEq(st.equipo);
+    $('hEquipo').textContent = st.equipo ? 'Tu equipo: ' + nombreEq(st.equipo) : 'Invitado: puedes invertir en todos los equipos';
     var usado = total(), quedan = st.presupuesto - usado;
     $('restante').textContent = quedan;
     $('barra').style.width = Math.min(100, usado / st.presupuesto * 100) + '%';
@@ -184,6 +184,7 @@
     var nombre = $('nombre').value.trim(), codigo = nombre, eq = $('equipo').value;
     $('errEntrar').textContent = '';
     if (nombre.length < 3) { $('errEntrar').textContent = 'Escribe tu nombre completo.'; return; }
+    if (eq === '') { $('errEntrar').textContent = 'Escoge tu equipo (o «No tengo equipo»).'; return; }
     $('btnEntrar').disabled = true; $('btnEntrar').textContent = 'Entrando…';
     llamar({ accion: 'entrar', nombre: nombre, codigo: codigo, equipo: eq }).then(function (d) {
       st = d; montos = Object.assign({}, d.inversiones); guardarCodigo(d.codigo); pintar();
