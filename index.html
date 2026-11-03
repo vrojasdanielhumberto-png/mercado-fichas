@@ -64,8 +64,6 @@
   <form id="entrar" hidden>
     <label for="nombre">Tu nombre</label>
     <input id="nombre" autocomplete="name" placeholder="Nombre y apellido">
-    <label for="codigo">Tu código de estudiante</label>
-    <input id="codigo" inputmode="numeric" autocomplete="off" placeholder="Ej.: 202212345">
     <label for="equipo">Tu equipo de hoy</label>
     <select id="equipo"><option value="">Escoge tu número de bandera</option></select>
     <button class="btn" type="submit" id="btnEntrar">Entrar</button>
@@ -183,9 +181,9 @@
 
   $('entrar').addEventListener('submit', function (e) {
     e.preventDefault();
-    var nombre = $('nombre').value.trim(), codigo = $('codigo').value.trim(), eq = $('equipo').value;
+    var nombre = $('nombre').value.trim(), codigo = nombre, eq = $('equipo').value;
     $('errEntrar').textContent = '';
-    if (!codigo) { $('errEntrar').textContent = 'Escribe tu código de estudiante.'; return; }
+    if (nombre.length < 3) { $('errEntrar').textContent = 'Escribe tu nombre completo.'; return; }
     $('btnEntrar').disabled = true; $('btnEntrar').textContent = 'Entrando…';
     llamar({ accion: 'entrar', nombre: nombre, codigo: codigo, equipo: eq }).then(function (d) {
       st = d; montos = Object.assign({}, d.inversiones); guardarCodigo(d.codigo); pintar();
