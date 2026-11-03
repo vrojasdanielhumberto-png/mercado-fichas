@@ -39,11 +39,11 @@
 <script src="config.js"></script>
 <script>
 (function () {
-  var API = window.API_URL || '';
+  var API = window.SUPABASE_URL || '';
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function cargar() {
     if (!API) { document.getElementById('err').textContent = 'La página aún no está conectada.'; return; }
-    fetch(API + '?accion=marcador').then(function (r) { return r.json(); }).then(function (d) {
+    fetch(API + '/rest/v1/rpc/fichas_marcador', { method: 'POST', headers: { 'apikey': window.SUPABASE_KEY, 'Content-Type': 'application/json' }, body: '{}' }).then(function (r) { return r.json(); }).then(function (d) {
       if (d.error) throw new Error(d.error);
       document.getElementById('err').textContent = '';
       var eq = d.equipos.slice().sort(function (a, b) { return b.total - a.total || a.numero - b.numero; });

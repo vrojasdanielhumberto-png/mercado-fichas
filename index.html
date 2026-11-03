@@ -89,17 +89,21 @@
 <script src="config.js"></script>
 <script>
 (function () {
-  var API = window.API_URL || '';
+  var API = window.SUPABASE_URL || '';
   var KEY = 'mercado-fichas-codigo';
   var st = null, montos = {}, saving = false, pendiente = false, timer = null;
   var $ = function (id) { return document.getElementById(id); };
 
   function llamar(params) {
-    var q = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
-    return fetch(API + '?' + q, { redirect: 'follow' }).then(function (r) { return r.json(); }).then(function (d) {
-      if (d && d.error) throw new Error(d.error);
-      return d;
-    });
+    var f, body;
+    if (params.accion === 'estado') { f = 'fichas_estado'; body = { p_codigo: params.codigo || '' }; }
+    else if (params.accion === 'entrar') { f = 'fichas_entrar'; body = { p_nombre: params.nombre, p_codigo: params.codigo, p_equipo: Number(params.equipo) || 0 }; }
+    else { f = 'fichas_guardar'; body = { p_codigo: params.codigo, p_montos: JSON.parse(params.montos) }; }
+    return fetch(API + '/rest/v1/rpc/' + f, {
+      method: 'POST',
+      headers: { 'apikey': window.SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error((d && d.message) || 'Error'); return d; }); });
   }
   function guardarCodigo(c) { try { localStorage.setItem(KEY, c); } catch (e) {} }
   function leerCodigo() { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } }
