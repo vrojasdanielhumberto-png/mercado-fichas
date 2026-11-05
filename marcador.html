@@ -5,6 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Marcador · Mercado de fichas</title>
+<link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@700;800&display=swap">
@@ -12,27 +13,39 @@
   :root { --bg: #0B2654; --ink: #FBF9FD; --muted: #B9C2DE; --accent: #762DA6; --turq: #5CD9DA; --yel: #FECE27; --row: #13306A;
     --f-title: "Poppins", sans-serif; --f-body: "DM Sans", system-ui, sans-serif; color-scheme: dark; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); padding: 28px max(16px, 3vw); min-height: 100vh; }
-  .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px 20px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); padding: 28px max(16px, 3vw); min-height: 100vh; overflow-x: hidden; position: relative; }
+  body::before, body::after { content: ""; position: fixed; border-radius: 50%; z-index: 0; pointer-events: none; }
+  body::before { width: 46vw; height: 46vw; right: -16vw; bottom: -22vw; background: var(--accent); opacity: .55; }
+  body::after { width: 9vw; height: 9vw; right: 24vw; bottom: 10vw; background: var(--turq); opacity: .8; }
+  .top, .lista, .err { position: relative; z-index: 1; }
+  .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 20px; }
+  .izq { display: flex; align-items: center; gap: 16px; }
+  .izq img { width: clamp(56px, 6vw, 90px); height: auto; animation: flota 3.2s ease-in-out infinite; filter: drop-shadow(0 6px 14px rgba(0,0,0,.3)); }
   .marca { font: 700 .9rem var(--f-body); letter-spacing: .14em; text-transform: uppercase; color: var(--turq); }
-  h1 { font: 800 clamp(1.8rem, 4vw, 3rem)/1.1 var(--f-title); margin: 4px 0 0; }
-  .stats { font-size: clamp(1rem, 1.6vw, 1.3rem); color: var(--muted); }
+  h1 { font: 800 clamp(1.8rem, 4vw, 3.2rem)/1.05 var(--f-title); margin: 4px 0 0; }
+  h1 span { color: var(--yel); }
+  .stats { font-size: clamp(1rem, 1.6vw, 1.3rem); color: var(--muted); background: rgba(255,255,255,.08); border-radius: 999px; padding: 8px 18px; }
   .stats b { color: var(--ink); }
   .lista { margin-top: 26px; display: grid; gap: 12px; }
-  .eq { display: grid; grid-template-columns: 56px 1fr auto; gap: 16px; align-items: center; background: var(--row); border-radius: 18px; padding: 14px 20px; }
-  .pos { width: 52px; height: 52px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font: 800 1.4rem var(--f-title); }
-  .nom { font: 700 clamp(1.1rem, 2.2vw, 1.7rem) var(--f-title); min-width: 0; overflow-wrap: anywhere; }
-  .barra { height: 12px; border-radius: 999px; background: rgba(255,255,255,.12); margin-top: 8px; overflow: hidden; }
-  .barra i { display: block; height: 100%; border-radius: 999px; background: var(--turq); transition: width .6s; }
-  .tot { font: 800 clamp(1.6rem, 3.4vw, 2.8rem) var(--f-title); font-variant-numeric: tabular-nums; }
+  .eq { display: grid; grid-template-columns: 60px 1fr auto; gap: 18px; align-items: center; background: var(--row); border-radius: 20px; padding: 14px 22px; border: 2px solid transparent; transition: transform .4s, border-color .4s; animation: entra .5s ease-out both; }
+  .eq:nth-child(2) { animation-delay: .05s; } .eq:nth-child(3) { animation-delay: .1s; } .eq:nth-child(4) { animation-delay: .15s; } .eq:nth-child(5) { animation-delay: .2s; } .eq:nth-child(6) { animation-delay: .25s; }
+  .eq.lider { border-color: var(--yel); box-shadow: 0 0 0 6px rgba(254,206,39,.12); }
+  .eq.lider .pos { background: var(--yel); color: #0B2654; }
+  .pos { width: 54px; height: 54px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font: 800 1.5rem var(--f-title); }
+  .nom { font: 700 clamp(1.1rem, 2.2vw, 1.8rem) var(--f-title); min-width: 0; overflow-wrap: anywhere; }
+  .barra { height: 14px; border-radius: 999px; background: rgba(255,255,255,.12); margin-top: 10px; overflow: hidden; }
+  .barra i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--turq), var(--yel)); transition: width .8s cubic-bezier(.2,.8,.2,1); }
+  .tot { font: 800 clamp(1.8rem, 3.6vw, 3rem) var(--f-title); font-variant-numeric: tabular-nums; }
   .tag { display: inline-block; margin-left: 10px; font: 700 .8rem var(--f-body); background: var(--yel); color: #0B2654; border-radius: 999px; padding: 2px 12px; vertical-align: middle; }
   .err { color: var(--yel); margin-top: 20px; }
-  @media (prefers-reduced-motion: reduce) { .barra i { transition: none; } }
+  @keyframes entra { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @keyframes flota { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
   <div class="top">
-    <div><div class="marca">Achievers Lab · Shark Tank Uniandino</div><h1>Mercado de fichas</h1></div>
+    <div class="izq"><img src="logo.png" alt="Achievers Lab"><div><div class="marca">Achievers Lab · Shark Tank Uniandino</div><h1>Mercado de <span>fichas</span></h1></div></div>
     <div class="stats" id="stats">Cargando…</div>
   </div>
   <div class="lista" id="lista"></div>
@@ -53,7 +66,7 @@
       document.getElementById('stats').innerHTML = '<b>' + d.invirtieron + '</b> de <b>' + d.registrados + '</b> ya invirtieron' + (d.abierto ? '' : ' · <b>Mercado cerrado</b>');
       document.getElementById('lista').innerHTML = eq.map(function (q) {
         var rank = 1 + eq.filter(function (o) { return o.total > q.total; }).length;
-        return '<div class="eq"><div class="pos">' + rank + '</div><div class="nom">Equipo ' + q.numero + (q.nombre ? ': ' + esc(q.nombre) : '') +
+        return '<div class="eq' + (rank === 1 && max > 0 ? ' lider' : '') + '"><div class="pos">' + rank + '</div><div class="nom">Equipo ' + q.numero + (q.nombre ? ': ' + esc(q.nombre) : '') +
           (max > 0 && q.total === min ? '<span class="tag">Va de último</span>' : '') +
           '<div class="barra"><i style="width:' + (max ? Math.max(2, q.total / max * 100) : 0) + '%"></i></div></div>' +
           '<div class="tot">' + q.total + '</div></div>';
