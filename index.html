@@ -101,7 +101,7 @@
   <form id="entrar" hidden>
     <label for="nombre">Tu nombre</label>
     <input id="nombre" autocomplete="name" placeholder="Nombre y apellido">
-    <label for="equipo">Tu equipo de hoy</label>
+    <label for="equipo">Tu grupo</label>
     <select id="equipo"><option value="">Escoge tu número de bandera</option></select>
     <button class="btn" type="submit" id="btnEntrar">Entrar</button>
     <p class="estado err" id="errEntrar" role="alert"></p>
@@ -156,7 +156,7 @@
   function mostrarEntrar(equipos) {
     $('cargando').hidden = true; $('perfil').hidden = true; $('entrar').hidden = false;
     var sel = $('equipo'), v = sel.value;
-    sel.innerHTML = '<option value="">Escoge tu número de bandera</option><option value="0">No tengo equipo (invitado o profesor)</option>' + (equipos || []).map(function (q) {
+    sel.innerHTML = '<option value="">Escoge tu grupo</option>' + (equipos || []).map(function (q) {
       return '<option value="' + q.numero + '">Equipo ' + q.numero + (q.nombre ? ': ' + esc(q.nombre) : '') + '</option>';
     }).join('');
     sel.value = v;
@@ -226,7 +226,7 @@
     var nombre = $('nombre').value.trim(), codigo = nombre, eq = $('equipo').value;
     $('errEntrar').textContent = '';
     if (nombre.length < 3) { $('errEntrar').textContent = 'Escribe tu nombre completo.'; return; }
-    if (eq === '') { $('errEntrar').textContent = 'Escoge tu equipo (o «No tengo equipo»).'; return; }
+    if (eq === '') { $('errEntrar').textContent = 'Escoge tu grupo.'; return; }
     $('btnEntrar').disabled = true; $('btnEntrar').textContent = 'Entrando…';
     llamar({ accion: 'entrar', nombre: nombre, codigo: codigo, equipo: eq }).then(function (d) {
       st = d; montos = Object.assign({}, d.inversiones); guardarCodigo(d.codigo); pintar();
