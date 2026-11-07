@@ -111,6 +111,8 @@
     <input id="empresa" autocomplete="organization" placeholder="Empresa">
     <label for="cargo">¿Qué cargo tienes? <span class="opc">(opcional)</span></label>
     <input id="cargo" autocomplete="organization-title" placeholder="Cargo">
+    <label for="edad">Rango de edad <span class="opc">(opcional)</span></label>
+    <select id="edad"><option value="">Prefiero no decir</option><option>18 a 24</option><option>25 a 34</option><option>35 a 44</option><option>45 a 54</option><option>55 a 64</option><option>65 o más</option></select>
     <label for="equipo">Tu grupo <span class="obl">*</span></label>
     <select id="equipo"><option value="">Escoge tu número de bandera</option></select>
     <button class="btn" type="submit" id="btnEntrar">Entrar</button>
@@ -156,7 +158,7 @@
   function llamar(params) {
     var f, body;
     if (params.accion === 'estado') { f = 'fichas_estado'; body = { p_codigo: params.codigo || '' }; }
-    else if (params.accion === 'entrar') { f = 'fichas_registrar'; body = { p_nombre: params.nombre, p_correo: params.correo, p_equipo: Number(params.equipo) || 0, p_telefono: params.telefono || null, p_empresa: params.empresa || null, p_cargo: params.cargo || null }; }
+    else if (params.accion === 'entrar') { f = 'fichas_registrar'; body = { p_nombre: params.nombre, p_correo: params.correo, p_equipo: Number(params.equipo) || 0, p_telefono: params.telefono || null, p_empresa: params.empresa || null, p_cargo: params.cargo || null, p_edad: params.edad || null }; }
     else { f = 'fichas_guardar'; body = { p_codigo: params.codigo, p_montos: JSON.parse(params.montos) }; }
     return fetch(API + '/rest/v1/rpc/' + f, {
       method: 'POST',
@@ -277,7 +279,7 @@
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) { $('errEntrar').textContent = 'Escribe un correo válido.'; return; }
     if (eq === '') { $('errEntrar').textContent = 'Escoge tu grupo.'; return; }
     $('btnEntrar').disabled = true; $('btnEntrar').textContent = 'Entrando…';
-    llamar({ accion: 'entrar', nombre: nombre, correo: correo, equipo: eq, telefono: $('telefono').value.trim(), empresa: $('empresa').value.trim(), cargo: $('cargo').value.trim() }).then(function (d) {
+    llamar({ accion: 'entrar', nombre: nombre, correo: correo, equipo: eq, telefono: $('telefono').value.trim(), empresa: $('empresa').value.trim(), cargo: $('cargo').value.trim(), edad: $('edad').value }).then(function (d) {
       st = d; montos = Object.assign({}, d.inversiones); guardarCodigo(d.codigo); pintar();
     }).catch(function (err) {
       $('errEntrar').textContent = err.message || 'No se pudo entrar. Revisa tu conexión.';
