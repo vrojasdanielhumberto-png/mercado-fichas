@@ -83,6 +83,8 @@
   .estado.ok { color: #0B7A55; } .estado.err { color: #B4321A; } .estado.info { color: var(--muted); }
   .aviso { background: var(--yel); color: var(--ink); border-radius: 12px; padding: 10px 14px; font-weight: 700; margin-top: 12px; }
   .cargando { color: var(--muted); padding: 30px 0; text-align: center; }
+  label .obl { color: var(--accent); }
+  label .opc { color: var(--muted); font-weight: 500; }
   [hidden] { display: none !important; }
   @keyframes entra { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   @keyframes flota { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
@@ -99,9 +101,17 @@
   <div id="cargando" class="cargando">Cargando…</div>
 
   <form id="entrar" hidden>
-    <label for="nombre">Tu nombre</label>
-    <input id="nombre" autocomplete="name" placeholder="Nombre y apellido">
-    <label for="equipo">Tu grupo</label>
+    <label for="nombre">Tu nombre <span class="obl">*</span></label>
+    <input id="nombre" autocomplete="name" placeholder="Nombre y apellido" required>
+    <label for="correo">Tu correo <span class="obl">*</span></label>
+    <input id="correo" type="email" autocomplete="email" inputmode="email" placeholder="nombre@empresa.com" required>
+    <label for="telefono">Teléfono <span class="opc">(opcional)</span></label>
+    <input id="telefono" type="tel" autocomplete="tel" inputmode="tel" placeholder="300 000 0000">
+    <label for="empresa">¿En qué empresa trabajas? <span class="opc">(opcional)</span></label>
+    <input id="empresa" autocomplete="organization" placeholder="Empresa">
+    <label for="cargo">¿Qué cargo tienes? <span class="opc">(opcional)</span></label>
+    <input id="cargo" autocomplete="organization-title" placeholder="Cargo">
+    <label for="equipo">Tu grupo <span class="obl">*</span></label>
     <select id="equipo"><option value="">Escoge tu número de bandera</option></select>
     <button class="btn" type="submit" id="btnEntrar">Entrar</button>
     <p class="estado err" id="errEntrar" role="alert"></p>
@@ -136,7 +146,7 @@
   function llamar(params) {
     var f, body;
     if (params.accion === 'estado') { f = 'fichas_estado'; body = { p_codigo: params.codigo || '' }; }
-    else if (params.accion === 'entrar') { f = 'fichas_entrar'; body = { p_nombre: params.nombre, p_codigo: params.codigo, p_equipo: Number(params.equipo) || 0 }; }
+    else if (params.accion === 'entrar') { f = 'fichas_registrar'; body = { p_nombre: params.nombre, p_correo: params.correo, p_equipo: Number(params.equipo) || 0, p_telefono: params.telefono || null, p_empresa: params.empresa || null, p_cargo: params.cargo || null }; }
     else { f = 'fichas_guardar'; body = { p_codigo: params.codigo, p_montos: JSON.parse(params.montos) }; }
     return fetch(API + '/rest/v1/rpc/' + f, {
       method: 'POST',
@@ -223,12 +233,13 @@
 
   $('entrar').addEventListener('submit', function (e) {
     e.preventDefault();
-    var nombre = $('nombre').value.trim(), codigo = nombre, eq = $('equipo').value;
+    var nombre = $('nombre').value.trim(), correo = $('correo').value.trim().toLowerCase(), eq = $('equipo').value;
     $('errEntrar').textContent = '';
     if (nombre.length < 3) { $('errEntrar').textContent = 'Escribe tu nombre completo.'; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) { $('errEntrar').textContent = 'Escribe un correo válido.'; return; }
     if (eq === '') { $('errEntrar').textContent = 'Escoge tu grupo.'; return; }
     $('btnEntrar').disabled = true; $('btnEntrar').textContent = 'Entrando…';
-    llamar({ accion: 'entrar', nombre: nombre, codigo: codigo, equipo: eq }).then(function (d) {
+    llamar({ accion: 'entrar', nombre: nombre, correo: correo, equipo: eq, telefono: $('telefono').value.trim(), empresa: $('empresa').value.trim(), cargo: $('cargo').value.trim() }).then(function (d) {
       st = d; montos = Object.assign({}, d.inversiones); guardarCodigo(d.codigo); pintar();
     }).catch(function (err) {
       $('errEntrar').textContent = err.message || 'No se pudo entrar. Revisa tu conexión.';
