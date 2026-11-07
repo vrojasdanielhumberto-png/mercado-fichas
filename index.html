@@ -133,6 +133,16 @@
     <div class="card" id="lista"></div>
     <p class="estado info" id="guardado" role="status"></p>
   </section>
+
+  <section id="encuentro" hidden>
+    <div class="card">
+      <h2 id="eHola">Siguiente encuentro</h2>
+      <p class="sub" style="margin:6px 0 14px">¿Cuándo nos volvemos a ver? Escoge la fecha que más te sirve.</p>
+      <div id="eOpciones" style="display:grid;gap:10px"></div>
+      <p class="estado info" id="eEstado" role="status"></p>
+      <a class="btn" id="eWhats" href="https://chat.whatsapp.com/KzZzofJeDQgKzKg7fPDOoi" hidden style="display:flex;align-items:center;justify-content:center;text-decoration:none">Unirme al grupo de WhatsApp</a>
+    </div>
+  </section>
 </div>
 
 <script>window.SUPABASE_URL = "https://kkslqrumxbagwzwqmvbh.supabase.co"; window.SUPABASE_KEY = "sb_publishable_eXQyVvL8KHPn2uO0oPesbg_dEK-s9-a";</script>
@@ -164,7 +174,7 @@
   function total() { var t = 0; for (var k in montos) t += montos[k] || 0; return t; }
 
   function mostrarEntrar(equipos) {
-    $('cargando').hidden = true; $('perfil').hidden = true; $('entrar').hidden = false;
+    $('cargando').hidden = true; $('perfil').hidden = true; $('encuentro').hidden = true; $('entrar').hidden = false;
     var sel = $('equipo'), v = sel.value;
     sel.innerHTML = '<option value="">Escoge tu grupo</option>' + (equipos || []).map(function (q) {
       return '<option value="' + q.numero + '">Equipo ' + q.numero + (q.nombre ? ': ' + esc(q.nombre) : '') + '</option>';
@@ -173,7 +183,35 @@
   }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 
+  var WHATS = 'https://chat.whatsapp.com/KzZzofJeDQgKzKg7fPDOoi';
+  function pintarEncuentro() {
+    $('cargando').hidden = true; $('entrar').hidden = true; $('perfil').hidden = true; $('encuentro').hidden = false;
+    $('eHola').textContent = 'Siguiente encuentro, ' + st.nombre.split(' ')[0];
+    $('eOpciones').innerHTML = (st.opciones_encuentro || []).map(function (o) {
+      var mio = st.mi_encuentro === o.opcion;
+      return '<button type="button" class="btn" data-op="' + o.opcion + '" style="text-align:left;' + (mio ? '' : 'background:transparent;color:inherit;border:2px solid currentColor;') + '">' + (mio ? '✓ ' : '') + esc(o.texto) + '</button>';
+    }).join('');
+    $('eWhats').hidden = !st.mi_encuentro;
+  }
+  $('eOpciones').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-op]'); if (!b || saving) return;
+    saving = true; $('eEstado').textContent = 'Guardando…'; $('eEstado').className = 'estado info';
+    fetch(API + '/rest/v1/rpc/fichas_votar_encuentro', {
+      method: 'POST', headers: { 'apikey': window.SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_codigo: st.codigo, p_opcion: Number(b.dataset.op) })
+    }).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error((d && d.message) || 'Error'); return d; }); })
+    .then(function (d) {
+      st = d; pintarEncuentro();
+      $('eEstado').textContent = '¡Listo! Te llevamos al grupo de WhatsApp…'; $('eEstado').className = 'estado ok';
+      setTimeout(function () { window.location.href = WHATS; }, 1200);
+    }).catch(function (err) {
+      $('eEstado').textContent = err.message || 'No se pudo guardar. Revisa tu conexión.'; $('eEstado').className = 'estado err';
+    }).then(function () { saving = false; });
+  });
+
   function pintar() {
+    if (st.encuentro) { pintarEncuentro(); return; }
+    $('encuentro').hidden = true;
     $('cargando').hidden = true; $('entrar').hidden = true; $('perfil').hidden = false;
     $('hNombre').textContent = 'Hola, ' + st.nombre.split(' ')[0];
     $('hEquipo').textContent = st.equipo ? 'Tu equipo: ' + nombreEq(st.equipo) : 'Invitado: puedes invertir en todos los equipos';
@@ -267,7 +305,7 @@
     }).catch(function () { $('cargando').textContent = 'No se pudo conectar. Revisa tu internet y recarga la página.'; });
   }
   arrancar();
-  setInterval(refrescar, 15000);
+  setInterval(refrescar, 10000);
 })();
 </script>
 </body>
